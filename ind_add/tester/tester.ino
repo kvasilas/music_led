@@ -139,9 +139,9 @@ void FillLEDsFromPaletteColors( uint8_t colorIndex){
     {
         brightness = 255;
     }
-    else
+    while(status_on == false)
     {
-        Serial.println(status_on);
+        //Serial.println(status_on);
         brightness = 0;
     }
 
