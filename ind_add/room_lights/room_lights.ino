@@ -18,7 +18,11 @@ uint8_t brightness = 255;
 
 #define UPDATES_PER_SECOND 100
 
-
+//Pin reads
+bool d1 = false;
+bool d2 = false;
+bool d3 = false;
+bool d4 = false;
 
 
 CRGBPalette16 currentPalette;
@@ -43,6 +47,27 @@ void setup() {
     Serial.println("***************************");
     Serial.println("Enter your choice");
 }
+
+/*
+void loop(){
+    d1 = Serial.read(p1);
+    d2 = Serial.read(p2);
+    d3 = Serial.read(p3);
+    d4 = Serial.read(p4);
+    
+    if(d1 && !d2 && !d3 && !d4){
+        Serial.println("Freedom - Linear");
+        currentPalette = myRedWhiteBluePalette_p;
+        currentBlending = LINEARBLEND;
+    }
+    if(d1 && !d2 && !d3 && !d4){
+        Serial.println("yelllow - Linear");
+        yelllow_setup();
+        currentBlending = LINEARBLEND;
+    }
+}
+*/
+
 
 void loop(){
     //prev_func = curr_func;
