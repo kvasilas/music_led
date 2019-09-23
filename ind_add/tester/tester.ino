@@ -1,13 +1,14 @@
 #include <FastLED.h>
 
 #define LED_PIN     5
-#define NUM_LEDS    25
+#define NUM_LEDS    75
 #define BRIGHTNESS  64
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 CRGB leds[NUM_LEDS];
 bool status_on = true;
 uint8_t brightness = 255;
+//static uint8_t startIndex = 0;
 
 #define UPDATES_PER_SECOND 100
 
@@ -52,8 +53,8 @@ void loop(){
             currentBlending = NOBLEND;
             break;
         case 'c':
-            Serial.println("RainbowStripeColors - Linear");
-            currentPalette = RainbowStripeColors_p;
+            Serial.println("Lava - Linear");
+            currentPalette = LavaColors_p;
             currentBlending = LINEARBLEND;
             break;
         case 'd':
@@ -101,9 +102,16 @@ void loop(){
             yelllow_setup();
             currentBlending = LINEARBLEND;
             break;
+        case 'm':
+            Serial.println("yellow2 - Linear");
+            yelllow_setup2();
+            currentBlending = LINEARBLEND;
+            break;
+
         case 'o':
-            Serial.println("OFF");
-            status_on = false;
+            Serial.println("bounce - Linear");
+            SetupBlackAndWhiteStripedPalette();
+            currentBlending = LINEARBLEND;
             break;
     }
     run_me();
@@ -115,29 +123,33 @@ void run_me(){
     startIndex = startIndex + 1; // motion speed
 
     FillLEDsFromPaletteColors(startIndex);
+    //bounce(startIndex);
 
     FastLED.show();
     FastLED.delay(1000 / UPDATES_PER_SECOND);
 }
 
 void FillLEDsFromPaletteColors( uint8_t colorIndex){
-    if (status_on == true)
-    {
-        brightness = 255;
-    }
-    else
-    {
-        Serial.println(status_on);
-        brightness = 0;
-    }
-
     for (int i = 0; i < NUM_LEDS; i++)
     {
         leds[i] = ColorFromPalette(currentPalette, colorIndex, brightness, currentBlending);
         colorIndex += 3;
     }   
 }
-
+/*
+void bounce(uint8_t colorIndex){
+//    for (int i = 0; i < NUM_LEDS; i++)
+//    {
+//        leds[i] = ColorFromPalette(currentPalette, colorIndex, brightness, currentBlending);
+//        colorIndex += 3;
+//    }
+    for (int i = NUM_LEDS; i > 0; i--)
+    {
+        leds[i] = ColorFromPalette(currentPalette, colorIndex, brightness, currentBlending);
+        colorIndex += 3;
+    }
+}
+*/
 void ChangePalettePeriodically()
 {
     uint8_t secondHand = (millis() / 1000) % 60;
@@ -148,7 +160,7 @@ void ChangePalettePeriodically()
         if( secondHand ==  0)  { currentPalette = RainbowColors_p;         currentBlending = LINEARBLEND; }
         if( secondHand == 10)  { currentPalette = RainbowStripeColors_p;   currentBlending = NOBLEND;  }
         if( secondHand == 15)  { currentPalette = RainbowStripeColors_p;   currentBlending = LINEARBLEND; }
-        if( secondHand == 20)  { SetupPurpleAndGreenPalette();             currentBlending = LINEARBLEND; }
+        if( secondHand == 20)  { SetupPurpleAndGreenPalette();              currentBlending = LINEARBLEND; }
         if( secondHand == 25)  { SetupTotallyRandomPalette();              currentBlending = LINEARBLEND; }
         if( secondHand == 30)  { SetupBlackAndWhiteStripedPalette();       currentBlending = NOBLEND; }
         if( secondHand == 35)  { SetupBlackAndWhiteStripedPalette();       currentBlending = LINEARBLEND; }
@@ -173,10 +185,24 @@ void SetupBlackAndWhiteStripedPalette()
     fill_solid( currentPalette, 16, CRGB::Black);
     // and set every fourth one to white.
     currentPalette[0] = CRGB::White;
-    currentPalette[4] = CRGB::White;
-    currentPalette[8] = CRGB::White;
-    currentPalette[12] = CRGB::White;
+    //currentPalette[4] = CRGB::White;
+    //currentPalette[8] = CRGB::White;
+    //currentPalette[12] = CRGB::White;
     
+}
+
+void yelllow_setup()
+{
+    // 'black out' all 16 palette entries...
+    fill_solid( currentPalette, 16, CRGB::FairyLight);
+    brightness = 150;
+}
+
+void yelllow_setup2()
+{
+    // 'black out' all 16 palette entries...
+    fill_solid( currentPalette, 16, CRGB::FairyLightNCC );
+    brightness = 150;
 }
 
 void SetupPurpleAndGreenPalette()
@@ -213,11 +239,3 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
     CRGB::Black,
     CRGB::Black
 };
-
-void yelllow_setup()
-{
-    CRGB yellow = CHSV(HUE_Yellow, 150, 150);
-    CRGB black = CRGB::Black;
-
-    currentPalette = CRGBPalette16(yellow);
-}
