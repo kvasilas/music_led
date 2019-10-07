@@ -12,9 +12,9 @@
 #define BRIGHTNESS  64
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define RED_BTN     1
-#define GRE_BTN     2
-#define BLK_BTN     3
+#define RED_BTN     13
+#define GRE_BTN     12
+#define BLK_BTN     8
 CRGB leds[NUM_LEDS];
 bool status_on = true;
 uint8_t brightness = 255;
@@ -22,9 +22,11 @@ uint8_t brightness = 255;
 #define UPDATES_PER_SECOND 100
 
 //Pin reads for buttons
-bool d1 = false;
-bool d2 = false;
-bool d3 = false;
+int r1 = 0;
+int r2 = 0;
+int r3 = 0;
+int curr_state = 0;
+int next_state = 0;
 
 CRGBPalette16 currentPalette;
 TBlendType    currentBlending;
@@ -35,8 +37,8 @@ extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 
 void setup() {
     delay( 3000 ); // power-up safety delay
-    FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-    FastLED.setBrightness(  BRIGHTNESS );
+    FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.setBrightness(BRIGHTNESS);
     
     yelllow_setup();
     currentBlending = LINEARBLEND;
@@ -49,70 +51,101 @@ void setup() {
     Serial.println("Enter your choice");
 }
 
-/*
-void loop(){
-    d1 = digital.read(p1);
-    d2 = digital.read(p2);
-    d3 = digital.read(p3);
-
-    
-    if(d1 && !d2 && !d3){
-        Serial.println("Freedom - Linear");
-        currentPalette = myRedWhiteBluePalette_p;
-        currentBlending = LINEARBLEND;
-    }
-    if(d1 && !d2 && !d3){
-        Serial.println("yelllow - Linear");
-        yelllow_setup();
-        currentBlending = LINEARBLEND;
-    }
-}
-*/
-
 
 void loop(){
-    //prev_func = curr_func;
-    //digital read all pins and compare state if state changes to make it happen always
-    int input = Serial.read();
-    switch(input){
-        case '0':
+    r1 = digitalRead(RED_BTN);
+    r2 = digitalRead(GRE_BTN);
+    r3 = digitalRead(BLK_BTN);
+    // Red -- Green -- Black
+    //  x  --   x   --   x
+
+    if (r1 == LOW && r2 == LOW && r3 == LOW)
+    {
+        next_state = 0;
+        if (next_state != curr_state)
+        {
             Serial.println("yelllow - Linear");
             yelllow_setup();
             currentBlending = LINEARBLEND;
-            break;
-        case '1':
+            curr_state = 0;
+        }
+    }
+    if (r1 == LOW && r2 == LOW && r3 == HIGH)
+    {
+        next_state = 1;
+        if (next_state != curr_state)
+        {
             Serial.println("Freedom - Linear");
             currentPalette = myRedWhiteBluePalette_p;
             currentBlending = LINEARBLEND;
-            break;
-        case '2':
+            curr_state = 1;
+        }
+    }
+    else if (r1 == LOW && r2 == HIGH && r3 == LOW)
+    {
+        next_state = 2;
+        if (next_state != curr_state)
+        {
             Serial.println("Random - Linear");
             RandomPalette();
             currentBlending = LINEARBLEND;
-            break;
-        case '3':
+            curr_state = 2;
+        }
+    }
+    else if (r1 == LOW && r2 == HIGH && r3 == HIGH)
+    {
+        next_state = 3;
+        if (next_state != curr_state)
+        {
             Serial.println("Lava - Linear");
             currentPalette = LavaColors_p;
             currentBlending = LINEARBLEND;
-            break;
-        case '4':
+            curr_state = 3;
+        }
+    }
+    else if (r1 == HIGH && r2 == LOW && r3 == LOW)
+    {
+        next_state = 4;
+        if (next_state != curr_state)
+        {
             Serial.println("RainbowColors - Linear");
             currentPalette = RainbowColors_p;
             currentBlending = LINEARBLEND;
-            break;
-        case '5':
-            Serial.println("bounce");
-            break;
-        case '6':
+            curr_state = 4;
+        }
+    }
+    else if (r1 == HIGH && r2 == LOW && r3 == HIGH)
+    {
+        next_state = 5;
+        if (next_state != curr_state)
+        {
+            Serial.println("black and white");
+            blue_setup();
+            currentBlending = LINEARBLEND;
+            curr_state = 5;
+        }
+    }
+    else if (r1 == HIGH && r2 == HIGH && r3 == LOW)
+    {
+        next_state = 6;
+        if (next_state != curr_state)
+        {
             Serial.println("Black and White - Linear");
             BlackAndWhiteStripes();
             currentBlending = LINEARBLEND;
-            break;
-        case '7':
+            curr_state = 6;
+        }
+    }
+    else if (r1 == HIGH && r2 == HIGH && r3 == HIGH)
+    {
+        next_state = 7;
+        if (next_state != curr_state)
+        {
             Serial.println("Cloud - Linear");
             currentPalette = CloudColors_p;
             currentBlending = LINEARBLEND;
-            break;
+            curr_state = 7;
+        }
     }
     run_me();
 }
@@ -182,3 +215,9 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
     CRGB::Black,
     CRGB::Black
 };
+
+void blue_setup()
+{
+    fill_solid(currentPalette, 16, CRGB::LightBlue);
+    brightness = 200;
+}

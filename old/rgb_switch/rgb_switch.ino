@@ -1,14 +1,14 @@
 // Define Pins
-#define BLUE 2
-#define GREEN 12
-#define RED 7
+#define WHITE 5
+#define GREEN 4
+#define RED 3
 
 void setup()
 {
 pinMode(RED, OUTPUT);
 pinMode(GREEN, OUTPUT);
 pinMode(BLUE, OUTPUT);
-digitalWrite(RED, HIGH);
+digitalWrite(RED, LOW);
 digitalWrite(GREEN, LOW);
 digitalWrite(BLUE, LOW);
 }
