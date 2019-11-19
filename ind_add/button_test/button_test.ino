@@ -17,7 +17,6 @@ void setup()
     Serial.begin(115200);
     delay(500);
 
-
     pinMode(RED, OUTPUT);
     pinMode(GREEN, OUTPUT);
     pinMode(WHITE, OUTPUT);
@@ -45,7 +44,6 @@ void loop(){
     }
     else if (r1 == LOW && r2 == HIGH && r3 == LOW)
     {
-
         next_state = 2;
         if(next_state != curr_state){
             two_high();

@@ -12,8 +12,8 @@
 #define BRIGHTNESS  64
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define RED_BTN     13
-#define GRE_BTN     12
+#define RED_BTN     12
+#define GRE_BTN     10
 #define BLK_BTN     8
 CRGB leds[NUM_LEDS];
 bool status_on = true;
@@ -48,7 +48,7 @@ void setup() {
     Serial.println("***************************");
     Serial.println("**  Serial Comm Set Up!  **");
     Serial.println("***************************");
-    Serial.println("Enter your choice");
+    Serial.println("Does it work?");
 }
 
 
@@ -58,7 +58,7 @@ void loop(){
     r3 = digitalRead(BLK_BTN);
     // Red -- Green -- Black
     //  x  --   x   --   x
-
+    
     if (r1 == LOW && r2 == LOW && r3 == LOW)
     {
         next_state = 0;
@@ -70,7 +70,7 @@ void loop(){
             curr_state = 0;
         }
     }
-    if (r1 == LOW && r2 == LOW && r3 == HIGH)
+    else if (r1 == LOW && r2 == LOW && r3 == HIGH)
     {
         next_state = 1;
         if (next_state != curr_state)
